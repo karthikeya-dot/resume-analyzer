@@ -1,0 +1,379 @@
+um<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Resume Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      background: #1e1e2f;
+      color: #f4f4f4;
+    }
+    .navbar {
+      background: #111827;
+      padding: 1rem;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .nav-link {
+      color: #e0e0e0;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+    .nav-link:hover { background: #374151; }
+    .page-container {
+      margin-top: 70px;
+      padding: 2rem;
+    }
+    .section {
+      background: #2a2a40;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+      margin-bottom: 2rem;
+      max-width: 800px;
+      margin: 2rem auto;
+      text-align: center;
+    }
+    .analyzer-container, .cv-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 6px;
+      border: 1px solid #4b5563;
+      font-family: monospace;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      background: #1f2937;
+      color: #f4f4f4;
+    }
+    .form-group { margin: 1rem 0; }
+    button {
+      padding: 0.7rem 1.5rem;
+      background: #14b8a6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 0.5rem;
+      transition: background 0.3s ease;
+    }
+    button:hover { background: #2dd4bf; }
+    .results {
+      margin-top: 2rem;
+      background: #334155;
+      padding: 1rem;
+      border-radius: 6px;
+      color: #e2e8f0;
+    }
+    .score {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #facc15;
+    }
+    .cv-template {
+      padding: 2rem;
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: 10px;
+      margin-top: 2rem;
+      color: #e2e8f0;
+    }
+    #home button {
+      margin-top: 1rem;
+      background: #6366f1;
+    }
+    #home button:hover {
+      background: #818cf8;
+    }
+    .sticker {
+      width: 100px;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-links">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#analyzer" class="nav-link">Analyzer</a>
+      <a href="#builder" class="nav-link">Builder</a>
+      <a href="#dashboard" class="nav-link">Dashboard</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#feedback" class="nav-link">Feedback</a>
+    </div>
+  </nav>
+
+  <div class="page-container">
+    <section id="home" class="section" data-aos="fade-down">
+      <img src="https://cdn-icons-png.flaticon.com/512/11355/11355399.png" alt="AI" class="sticker" data-aos="zoom-in" />
+      <h1 data-aos="zoom-in-up">Smart Resume Assistant</h1>
+      <p data-aos="fade">AI-powered resume analysis and building tools</p>
+      <div data-aos="fade-up" data-aos-delay="200">
+        <button onclick="showPage('analyzer')" data-aos="zoom-in">Go to Analyzer</button>
+        <button onclick="showPage('builder')" data-aos="zoom-in">Go to Resume Builder</button>
+        <button onclick="showPage('dashboard')" data-aos="zoom-in">View Dashboard</button>
+        <button onclick="showPage('about')" data-aos="zoom-in">Learn About Us</button>
+        <button onclick="showPage('feedback')" data-aos="zoom-in">Give Feedback</button>
+      </div>
+    </section>
+
+    <section id="analyzer" class="section" data-aos="fade-up" style="display: none;">
+      <img src="https://cdn-icons-png.flaticon.com/512/3039/3039435.png" alt="Analyzer" class="sticker" data-aos="flip-right" />
+      <div class="analyzer-container">
+        <h2 data-aos="fade">ATS Resume Analyzer</h2>
+        <div class="form-group" data-aos="fade-up">
+          <textarea id="resumeText" placeholder="Paste your resume text or upload a PDF..." data-aos="fade-right"></textarea>
+          <input type="file" id="resumeFile" accept=".pdf" data-aos="fade-left" />
+        </div>
+        <button onclick="analyzeATS()" data-aos="zoom-in">Analyze Resume</button>
+        <div class="results" id="results" data-aos="fade-up"></div>
+      </div>
+    </section>
+
+    <section id="builder" class="section" data-aos="fade-up" style="display: none;">
+      <img src="https://cdn-icons-png.flaticon.com/512/2917/2917995.png" alt="Builder" class="sticker" data-aos="fade-right" />
+      <h2 data-aos="fade-down">Resume Builder</h2>
+      <form class="cv-form">
+        <div class="form-group" data-aos="fade-up">
+          <label>Full Name <input type="text" id="fullName" required /></label>
+          <label>Email <input type="email" id="email" required /></label>
+          <label>Phone <input type="tel" id="phone" required /></label>
+          <label>Address <input type="text" id="address" required /></label>
+        </div>
+        <div class="form-group" data-aos="fade-left">
+          <label>Objective <textarea id="objective"></textarea></label>
+          <label>Education <textarea id="education" required></textarea></label>
+          <label>Marks / CGPA <input type="text" id="marks" required /></label>
+          <label>Experience <textarea id="experience" required></textarea></label>
+          <label>Projects <textarea id="projects"></textarea></label>
+          <label>Skills <textarea id="skills"></textarea></label>
+          <label>Hobbies <textarea id="hobbies"></textarea></label>
+          <label>Certificates <textarea id="certificates"></textarea></label>
+          <label>Languages <textarea id="languages"></textarea></label>
+        </div>
+        <div data-aos="zoom-in">
+          <button type="button" onclick="generateCV()">Generate Resume</button>
+          <button type="button" onclick="downloadCV()">Download Resume</button>
+        </div>
+      </form>
+      <div id="cv-preview" class="cv-template" data-aos="fade-up"></div>
+    </section>
+
+    <section id="dashboard" class="section" data-aos="fade-up" style="display: none;">
+      <img src="https://cdn-icons-png.flaticon.com/512/4697/4697260.png" alt="Dashboard" class="sticker" data-aos="flip-left" />
+      <h2>Dashboard</h2>
+      <div class="results" data-aos="fade-up">
+        <h3>Recent Resume Score</h3>
+        <p><strong>Last Score:</strong> 85/100</p>
+        <p><strong>Most Frequent Issue:</strong> Missing Keywords</p>
+      </div>
+      <div class="results" data-aos="fade-left">
+        <h3>Resume Builder Stats</h3>
+        <ul>
+          <li><strong>Total Resumes Created:</strong> 5</li>
+          <li><strong>Last Resume Date:</strong> April 9, 2025</li>
+        </ul>
+      </div>
+      <div class="results" data-aos="fade-right">
+        <h3>Suggestions</h3>
+        <ul>
+          <li>Update your Skills section with more action verbs.</li>
+          <li>Add certifications to boost credibility.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="about" class="section" data-aos="fade-up" style="display: none;">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png" alt="About" class="sticker" data-aos="fade-left" />
+      <h2>About Us</h2>
+      <p><strong>Smart Resume Assistant</strong> is an AI-powered platform designed to help job seekers build and refine resumes that stand out.</p>
+      <p>One of our core features is the <strong>ATS Resume Analyzer</strong>, which simulates how an Applicant Tracking System evaluates your resume.</p>
+      <h3>What is ATS?</h3>
+      <p>ATS stands for <em>Applicant Tracking System</em>—software used by many companies to filter and rank resumes before a human recruiter sees them.</p>
+      <h3>How Our ATS Analyzer Helps</h3>
+      <ul style="text-align: left;">
+        <li><strong>Keyword Detection</strong></li>
+        <li><strong>Section Completeness</strong></li>
+        <li><strong>Formatting Issues</strong></li>
+        <li><strong>Score & Insights</strong></li>
+      </ul>
+    </section>
+
+    <section id="feedback" class="section" data-aos="fade-up" style="display: none;">
+      <img src="https://cdn-icons-png.flaticon.com/512/3210/3210058.png" alt="Feedback" class="sticker" data-aos="zoom-in" />
+      <h2>Feedback</h2>
+      <p>We value your feedback! Let us know how we can improve.</p>
+      <form id="feedbackForm" style="display: grid; gap: 1rem; max-width: 600px; margin: 0 auto;" data-aos="fade">
+        <div class="form-group">
+          <label>Your Name <input type="text" id="feedbackName" required /></label>
+        </div>
+        <div class="form-group">
+          <label>Your Email <input type="email" id="feedbackEmail" required /></label>
+        </div>
+        <div class="form-group">
+          <label>Message <textarea id="feedbackMessage" rows="5" required></textarea></label>
+        </div>
+        <button type="button" onclick="submitFeedback()">Submit Feedback</button>
+        <div id="feedbackConfirmation" style="margin-top: 1rem; color: green;"></div>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const pageId = link.getAttribute('href').substring(1);
+        showPage(pageId);
+      });
+    });
+
+    function showPage(pageId) {
+      document.querySelectorAll('.section').forEach(section => {
+        section.style.display = 'none';
+      });
+      document.getElementById(pageId).style.display = 'block';
+      AOS.refresh();
+    }
+
+    showPage('home');
+
+    const requiredSections = ["education", "experience", "skills", "projects", "certifications"];
+    const atsKeywords = ["teamwork", "communication", "leadership", "problem solving"];
+    const formattingIssues = ["table", "column", "text box"];
+
+    document.getElementById('resumeFile').addEventListener('change', function() {
+      const file = this.files[0];
+      if (file.type === "application/pdf") {
+        const reader = new FileReader();
+        reader.onload = function() {
+          pdfjsLib.getDocument(new Uint8Array(this.result)).promise.then(pdf => {
+            let text = '';
+            let loaded = 0;
+            for (let i = 1; i <= pdf.numPages; i++) {
+              pdf.getPage(i).then(page => {
+                page.getTextContent().then(content => {
+                  text += content.items.map(item => item.str).join(' ') + ' ';
+                  loaded++;
+                  if (loaded === pdf.numPages) {
+                    document.getElementById('resumeText').value = text;
+                  }
+                });
+              });
+            }
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    });
+
+    function analyzeATS() {
+      const resumeText = document.getElementById('resumeText').value.toLowerCase();
+      const results = document.getElementById('results');
+
+      const missingSections = requiredSections.filter(s => !resumeText.includes(s));
+      const keywordMatches = atsKeywords.filter(k => resumeText.includes(k));
+      const formatIssuesFound = formattingIssues.filter(f => resumeText.includes(f));
+      const wordCount = resumeText.trim().split(/\s+/).length;
+
+      let score = 100;
+      score -= missingSections.length * 15;
+      score += keywordMatches.length * 5;
+      score = Math.max(0, Math.min(score, 100));
+
+      results.innerHTML = `
+        <div class="score">ATS Score: ${score}/100</div>
+        <ul>
+          <li><strong>Word Count:</strong> ${wordCount}</li>
+          <li><strong>Missing Sections:</strong> ${missingSections.join(', ') || 'None'}</li>
+          <li><strong>ATS Keywords Found:</strong> ${keywordMatches.join(', ') || 'None'}</li>
+          <li><strong>Formatting Issues Detected:</strong> ${formatIssuesFound.join(', ') || 'None'}</li>
+        </ul>
+      `;
+    }
+
+    function generateCV() {
+      const cvContent = `
+        <h2>${document.getElementById('fullName').value}</h2>
+        <p><strong>Email:</strong> ${document.getElementById('email').value}</p>
+        <p><strong>Phone:</strong> ${document.getElementById('phone').value}</p>
+        <p><strong>Address:</strong> ${document.getElementById('address').value}</p>
+        <h3>Objective</h3><p>${document.getElementById('objective').value}</p>
+        <h3>Education</h3><p>${document.getElementById('education').value}</p>
+        <p><strong>Marks / CGPA:</strong> ${document.getElementById('marks').value}</p>
+        <h3>Experience</h3><p>${document.getElementById('experience').value}</p>
+        <h3>Projects</h3><p>${document.getElementById('projects').value}</p>
+        <h3>Skills</h3><p>${document.getElementById('skills').value}</p>
+        <h3>Hobbies</h3><p>${document.getElementById('hobbies').value}</p>
+        <h3>Certificates</h3><p>${document.getElementById('certificates').value}</p>
+        <h3>Languages</h3><p>${document.getElementById('languages').value}</p>
+      `;
+      document.getElementById('cv-preview').innerHTML = cvContent;
+    }
+
+    function downloadCV() {
+      const element = document.getElementById('cv-preview');
+      const opt = {
+        margin: 0.5,
+        filename: 'My_Resume.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().from(element).set(opt).save();
+    }
+
+    function submitFeedback() {
+      const name = document.getElementById('feedbackName').value.trim();
+      const email = document.getElementById('feedbackEmail').value.trim();
+      const message = document.getElementById('feedbackMessage').value.trim();
+      const confirmation = document.getElementById('feedbackConfirmation');
+
+      if (!name || !email || !message) {
+        confirmation.style.color = 'red';
+        confirmation.textContent = 'Please fill out all fields.';
+        return;
+      }
+
+      confirmation.style.color = 'green';
+      confirmation.textContent = 'Thank you for your feedback!';
+      document.getElementById('feedbackForm').reset();
+    }
+
+    AOS.init({
+      offset: 100,
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true,
+      mirror: false
+    });
+  </script>
+</body>
+</html>
